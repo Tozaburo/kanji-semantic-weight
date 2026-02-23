@@ -18,11 +18,20 @@
     const displayedKanjisSize = $derived(
         `calc(${displayedKanjisVw.current} * 1vw)`,
     );
+    let isClosingDisplayMode = $state(false);
 
     function handleKeydown(event: KeyboardEvent) {
         if (event.key !== "Enter") return;
         if (event.isComposing || event.keyCode === 229) return;
+        event.stopPropagation();
         run();
+    }
+
+    function handleDisplayModeKeydown(event: KeyboardEvent) {
+        if (!isDisplayMode) return;
+        if (event.key !== "Enter") return;
+        if (event.isComposing || event.keyCode === 229) return;
+        void closeDisplayMode();
     }
 
     let embeddings: Embeddings | null = null;
@@ -84,9 +93,23 @@
         });
 
         isDisplayMode = true;
-        displayedKanjisVw.target = 50 / input.length;
+        void displayedKanjisVw.set(50 / input.length);
+    }
+
+    async function closeDisplayMode() {
+        if (isClosingDisplayMode) return;
+        isClosingDisplayMode = true;
+
+        try {
+            await displayedKanjisVw.set(baseSizeVw);
+            isDisplayMode = false;
+        } finally {
+            isClosingDisplayMode = false;
+        }
     }
 </script>
+
+<svelte:window onkeydown={handleDisplayModeKeydown} />
 
 <main>
     {#if isDisplayMode}
