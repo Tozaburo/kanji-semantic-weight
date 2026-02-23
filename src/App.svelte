@@ -18,6 +18,14 @@
     const displayedKanjisSize = $derived(
         `calc(${displayedKanjisVw.current} * 1vw)`,
     );
+    const displayedKanjisColorProgress = new Tween(0, {
+        duration: 380,
+        easing: cubicOut,
+    });
+    const baseKanjiColor = { l: 0.11, c: 0.0135, h: 91.45 };
+    const minKanjiHue = 29.23;
+    const maxKanjiHue = 264.052;
+    const activeKanjiColor = { l: 0.6142, c: 0.1036 };
     let isClosingDisplayMode = $state(false);
 
     function handleKeydown(event: KeyboardEvent) {
@@ -32,6 +40,19 @@
         if (event.key !== "Enter") return;
         if (event.isComposing || event.keyCode === 229) return;
         void closeDisplayMode();
+    }
+
+    function getDisplayedKanjiColor(weight: number) {
+        const t = displayedKanjisColorProgress.current;
+        const activeHue = minKanjiHue + (maxKanjiHue - minKanjiHue) * (1 - weight);
+
+        const l =
+            baseKanjiColor.l + (activeKanjiColor.l - baseKanjiColor.l) * t;
+        const c =
+            baseKanjiColor.c + (activeKanjiColor.c - baseKanjiColor.c) * t;
+        const h = baseKanjiColor.h + (activeHue - baseKanjiColor.h) * t;
+
+        return `oklch(${l} ${c} ${h})`;
     }
 
     let embeddings: Embeddings | null = null;
@@ -93,7 +114,10 @@
         });
 
         isDisplayMode = true;
-        void displayedKanjisVw.set(50 / input.length);
+        void Promise.all([
+            displayedKanjisVw.set(50 / input.length),
+            displayedKanjisColorProgress.set(1),
+        ]);
     }
 
     async function closeDisplayMode() {
@@ -101,7 +125,10 @@
         isClosingDisplayMode = true;
 
         try {
-            await displayedKanjisVw.set(baseSizeVw);
+            await Promise.all([
+                displayedKanjisVw.set(baseSizeVw),
+                displayedKanjisColorProgress.set(0),
+            ]);
             isDisplayMode = false;
         } finally {
             isClosingDisplayMode = false;
@@ -115,7 +142,9 @@
     {#if isDisplayMode}
         <span class="displayed-kanjis" style:font-size={displayedKanjisSize}
             >{#each kanjis as kanji, i}
-                <span style:color="oklch(0.6142 0.1036 {29.23 + (264.052 - 29.23) * (1 - weights[i])})">{kanji}</span>
+                <span style:color={getDisplayedKanjiColor(weights[i])}
+                    >{kanji}</span
+                >
             {/each}</span
         >
     {:else}
