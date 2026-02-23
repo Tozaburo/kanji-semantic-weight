@@ -1,0 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Zen+Old+Mincho&display=swap");
+
+:root {
+    font-family: "Zen Old Mincho", serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    background-color: oklch(0.99 0.0014 91.45);
+
+    /* font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale; */
+}
