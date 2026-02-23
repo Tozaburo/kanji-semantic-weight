@@ -10,9 +10,32 @@ export type Embeddings = {
     vectors: Float32Array;
 };
 
+async function fetchVectorPart(url: string): Promise<ArrayBuffer> {
+    const res = await fetch(url);
+    if (!res.ok) {
+        throw new Error(
+            `failed to fetch ${url} (${res.status} ${res.statusText})`,
+        );
+    }
+
+    const buf = await res.arrayBuffer();
+    const contentType = (res.headers.get("content-type") ?? "").toLowerCase();
+    if (contentType.includes("text/html")) {
+        throw new Error(
+            `${url} request returned HTML (${res.url}); add binary chunk files to public/`,
+        );
+    }
+
+    return buf;
+}
+
 export async function loadEmbeddings(): Promise<Embeddings> {
     const vocabUrl = "vocab.json";
-    const vecUrl = "vectors.f32";
+    const vecPartUrls = [
+        "vectors.f32.part0",
+        "vectors.f32.part1",
+        "vectors.f32.part2",
+    ];
 
     const vocabRes = await fetch(vocabUrl);
     if (!vocabRes.ok) {
@@ -28,26 +51,26 @@ export async function loadEmbeddings(): Promise<Embeddings> {
         throw new Error(`invalid vocab array in vocab.json (${vocabUrl})`);
     }
 
-    const vecRes = await fetch(vecUrl);
-    if (!vecRes.ok) {
+    const vecPartBuffers = await Promise.all(
+        vecPartUrls.map((url) => fetchVectorPart(url)),
+    );
+    const totalBytes = vecPartBuffers.reduce(
+        (sum, part) => sum + part.byteLength,
+        0,
+    );
+    if (totalBytes % Float32Array.BYTES_PER_ELEMENT !== 0) {
         throw new Error(
-            `failed to fetch vectors.f32 (${vecRes.status} ${vecRes.statusText}) from ${vecUrl}`,
+            `vector chunks are not float32-aligned (${totalBytes} bytes total)`,
         );
     }
-    const buf = await vecRes.arrayBuffer();
-    const contentType = (vecRes.headers.get("content-type") ?? "").toLowerCase();
-    if (contentType.includes("text/html")) {
-        throw new Error(
-            `vectors.f32 request returned HTML (${vecRes.url}); add binary embeddings to public/vectors.f32`,
-        );
+
+    const mergedBytes = new Uint8Array(totalBytes);
+    let cursor = 0;
+    for (const part of vecPartBuffers) {
+        mergedBytes.set(new Uint8Array(part), cursor);
+        cursor += part.byteLength;
     }
-    if (buf.byteLength % Float32Array.BYTES_PER_ELEMENT !== 0) {
-        const shownType = contentType || "unknown";
-        throw new Error(
-            `vectors.f32 is not float32-aligned (${buf.byteLength} bytes, content-type: ${shownType}, url: ${vecRes.url})`,
-        );
-    }
-    const vectors = new Float32Array(buf);
+    const vectors = new Float32Array(mergedBytes.buffer);
 
     const expected = vocabFile.vocab.length * vocabFile.dim;
     if (vectors.length !== expected) {
