@@ -44,7 +44,8 @@
 
     function getDisplayedKanjiColor(weight: number) {
         const t = displayedKanjisColorProgress.current;
-        const activeHue = minKanjiHue + (maxKanjiHue - minKanjiHue) * (1 - weight);
+        const activeHue =
+            minKanjiHue + (maxKanjiHue - minKanjiHue) * (1 - weight);
 
         const l =
             baseKanjiColor.l + (activeKanjiColor.l - baseKanjiColor.l) * t;
@@ -140,13 +141,23 @@
 
 <main>
     {#if isDisplayMode}
-        <span class="displayed-kanjis" style:font-size={displayedKanjisSize}
-            >{#each kanjis as kanji, i}
-                <span style:color={getDisplayedKanjiColor(weights[i])}
-                    >{kanji}</span
-                >
-            {/each}</span
-        >
+        <div class="displayed-kanjis">
+            {#each kanjis as kanji, i}
+                <div class="displayed-kanji">
+                    <span
+                        class="kanji"
+                        style:color={getDisplayedKanjiColor(weights[i])}
+                        style:font-size={displayedKanjisSize}>{kanji}</span
+                    >
+                    <span
+                        class="percentage"
+                        style:color={getDisplayedKanjiColor(weights[i])}
+                        style:font-size="calc({displayedKanjisSize} * 0.1)"
+                        >{(weights[i] * 100).toFixed(1)}%</span
+                    >
+                </div>
+            {/each}
+        </div>
     {:else}
         <input
             type="text"
@@ -188,10 +199,21 @@
         }
 
         .displayed-kanjis {
-            font-size: 2rem;
+            display: flex;
 
-            span {
-                color: oklch(0.11 0.0135 91.45);
+            .displayed-kanji {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+
+                .kanji {
+                    line-height: 1.2em;
+                }
+
+                .percentage {
+                    margin-top: 0.25em;
+                    font-size: 0.75rem;
+                }
             }
         }
     }
