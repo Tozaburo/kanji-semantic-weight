@@ -115,7 +115,7 @@
     {#if isDisplayMode}
         <span class="displayed-kanjis" style:font-size={displayedKanjisSize}
             >{#each kanjis as kanji, i}
-                <span style="opacity: {weights[i]}">{kanji}</span>
+                <span style:color="oklch(0.6142 0.1036 {29.23 + (264.052 - 29.23) * (1 - weights[i])})">{kanji}</span>
             {/each}</span
         >
     {:else}
