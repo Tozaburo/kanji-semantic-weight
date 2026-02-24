@@ -10,7 +10,15 @@ export type Embeddings = {
     vectors: Float32Array;
 };
 
-async function fetchVectorPart(url: string): Promise<ArrayBuffer> {
+type PartProgress = {
+    loadedBytes: number;
+    totalBytes: number | null;
+};
+
+async function fetchVectorPart(
+    url: string,
+    onProgress?: (progress: PartProgress) => void,
+): Promise<ArrayBuffer> {
     const res = await fetch(url);
     if (!res.ok) {
         throw new Error(
@@ -18,7 +26,6 @@ async function fetchVectorPart(url: string): Promise<ArrayBuffer> {
         );
     }
 
-    const buf = await res.arrayBuffer();
     const contentType = (res.headers.get("content-type") ?? "").toLowerCase();
     if (contentType.includes("text/html")) {
         throw new Error(
@@ -26,10 +33,49 @@ async function fetchVectorPart(url: string): Promise<ArrayBuffer> {
         );
     }
 
-    return buf;
+    const body = res.body;
+    if (body === null) {
+        const buf = await res.arrayBuffer();
+        onProgress?.({ loadedBytes: buf.byteLength, totalBytes: buf.byteLength });
+        return buf;
+    }
+
+    const contentLength = Number.parseInt(
+        res.headers.get("content-length") ?? "",
+        10,
+    );
+    const totalBytes =
+        Number.isFinite(contentLength) && contentLength > 0
+            ? contentLength
+            : null;
+
+    const reader = body.getReader();
+    const chunks: Uint8Array[] = [];
+    let loadedBytes = 0;
+    onProgress?.({ loadedBytes, totalBytes });
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (!value) continue;
+        chunks.push(value);
+        loadedBytes += value.byteLength;
+        onProgress?.({ loadedBytes, totalBytes });
+    }
+
+    const merged = new Uint8Array(loadedBytes);
+    let cursor = 0;
+    for (const chunk of chunks) {
+        merged.set(chunk, cursor);
+        cursor += chunk.byteLength;
+    }
+
+    return merged.buffer;
 }
 
-export async function loadEmbeddings(): Promise<Embeddings> {
+export async function loadEmbeddings(
+    onProgress?: (ratio: number) => void,
+): Promise<Embeddings> {
     const vocabUrl = "vocab.json";
     const vecPartUrls = [
         "vectors.f32.part0",
@@ -51,9 +97,51 @@ export async function loadEmbeddings(): Promise<Embeddings> {
         throw new Error(`invalid vocab array in vocab.json (${vocabUrl})`);
     }
 
+    const partLoadedBytes = vecPartUrls.map(() => 0);
+    const partTotalBytes = vecPartUrls.map(() => 0);
+    const partDone = vecPartUrls.map(() => false);
+    const reportProgress = () => {
+        if (!onProgress) return;
+
+        const hasAllTotals = partTotalBytes.every((total) => total > 0);
+        if (hasAllTotals) {
+            const loaded = partLoadedBytes.reduce((sum, value) => sum + value, 0);
+            const total = partTotalBytes.reduce((sum, value) => sum + value, 0);
+            onProgress(total > 0 ? Math.min(loaded / total, 1) : 0);
+            return;
+        }
+
+        const avgPartProgress =
+            partLoadedBytes.reduce((sum, loaded, index) => {
+                const total = partTotalBytes[index];
+                if (total > 0) return sum + Math.min(loaded / total, 1);
+                return sum + (partDone[index] ? 1 : 0);
+            }, 0) / vecPartUrls.length;
+        onProgress(avgPartProgress);
+    };
+
+    onProgress?.(0);
+
     const vecPartBuffers = await Promise.all(
-        vecPartUrls.map((url) => fetchVectorPart(url)),
+        vecPartUrls.map((url, index) =>
+            fetchVectorPart(url, (progress) => {
+                partLoadedBytes[index] = progress.loadedBytes;
+                if (progress.totalBytes !== null) {
+                    partTotalBytes[index] = progress.totalBytes;
+                }
+                reportProgress();
+            }).then((buffer) => {
+                partDone[index] = true;
+                if (partTotalBytes[index] === 0) {
+                    partTotalBytes[index] = partLoadedBytes[index];
+                }
+                reportProgress();
+                return buffer;
+            }),
+        ),
     );
+    onProgress?.(1);
+
     const totalBytes = vecPartBuffers.reduce(
         (sum, part) => sum + part.byteLength,
         0,

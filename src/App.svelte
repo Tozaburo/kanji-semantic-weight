@@ -39,6 +39,9 @@
     let isShowingHelp = $state(false);
     let error = $state("");
     let showError = $state(false);
+    let isLoadingVectors = $state(true);
+    let vectorLoadProgress = $state(0);
+    const vectorLoadPercent = $derived(Math.round(vectorLoadProgress * 100));
 
     if (window.matchMedia) {
         window
@@ -79,11 +82,20 @@
     let embeddings: Embeddings | null = null;
 
     onMount(async () => {
+        isLoadingVectors = true;
+        vectorLoadProgress = 0;
         try {
-            embeddings = await loadEmbeddings();
-        } catch (error) {
-            console.error("Failed to load embeddings:", error);
+            embeddings = await loadEmbeddings((ratio) => {
+                vectorLoadProgress = ratio;
+            });
+            vectorLoadProgress = 1;
+        } catch (err) {
+            console.error("Failed to load embeddings:", err);
             embeddings = null;
+            error = "埋め込みの読み込みに失敗しました。";
+            showError = true;
+        } finally {
+            isLoadingVectors = false;
         }
     });
 
@@ -167,6 +179,7 @@
         if (isDisplayMode) {
             void closeDisplayMode();
         } else {
+            if (isLoadingVectors) return;
             run();
         }
     }
@@ -203,14 +216,36 @@
         </div>
     {:else}
         <div class="input-wrapper">
-            <input
-                type="text"
-                placeholder="熟語を入力..."
-                onkeydown={handleKeydown}
-                bind:value={input}
-                {oninput}
-            />
-            <p class="error" style:opacity={showError ? 1 : 0}>{error}</p>
+            {#if isLoadingVectors}
+                <div class="vector-loading" aria-live="polite" aria-busy="true">
+                    <p class="vector-loading-label">
+                        ベクトルデータを読み込み中...
+                    </p>
+                    <div
+                        class="vector-loading-track"
+                        role="progressbar"
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={vectorLoadPercent}
+                        aria-label="ベクトルデータの読み込み進捗"
+                    >
+                        <div
+                            class="vector-loading-fill"
+                            style:width={`${vectorLoadPercent}%`}
+                        ></div>
+                    </div>
+                    <p class="vector-loading-percent">{vectorLoadPercent}%</p>
+                </div>
+            {:else}
+                <input
+                    type="text"
+                    placeholder="熟語を入力..."
+                    onkeydown={handleKeydown}
+                    bind:value={input}
+                    {oninput}
+                />
+                <p class="error" style:opacity={showError ? 1 : 0}>{error}</p>
+            {/if}
         </div>
     {/if}
 </main>
@@ -276,6 +311,7 @@
 
         .input-wrapper {
             position: relative;
+            width: min(32rem, 80vw);
 
             input {
                 font-size: 2rem;
@@ -289,11 +325,46 @@
                 font-family: "Zen Old Mincho", serif;
 
                 text-align: center;
+                width: 100%;
 
                 color: var(--color-text-primary);
 
                 &::placeholder {
                     color: var(--color-text-primary-muted);
+                }
+            }
+
+            .vector-loading {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+                width: 100%;
+
+                .vector-loading-label {
+                    color: var(--color-text-primary);
+                }
+
+                .vector-loading-track {
+                    width: 100%;
+                    height: 0.75rem;
+                    border-radius: 999px;
+                    border: 1px solid var(--color-modal-border);
+                    overflow: hidden;
+                    background-color: var(--color-bg-base);
+                }
+
+                .vector-loading-fill {
+                    height: 100%;
+                    border-radius: inherit;
+                    transition: width 0.12s linear;
+                    background-color: var(--color-text-primary);
+                }
+
+                .vector-loading-percent {
+                    color: var(--color-text-primary-muted);
+                    font-size: 0.875rem;
+                    font-variant-numeric: tabular-nums;
                 }
             }
 
