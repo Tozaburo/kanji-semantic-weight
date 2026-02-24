@@ -37,6 +37,8 @@
     });
     let isClosingDisplayMode = $state(false);
     let isShowingHelp = $state(false);
+    let error = $state("");
+    let showError = $state(false);
 
     if (window.matchMedia) {
         window
@@ -90,30 +92,35 @@
 
         // Validate whether the input is only kanji
         if (!/^[一-龯]+$/.test(input)) {
-            alert("熟語を入力してください（漢字のみ）");
+            error = "熟語を入力してください（漢字のみ）";
+            showError = true;
             return;
         }
 
         if (input.length < 2) {
-            alert("熟語は2文字以上で入力してください");
+            error = "熟語は2文字以上で入力してください";
+            showError = true;
             return;
         }
 
         if (embeddings === null) {
-            alert("埋め込みの読み込みに失敗しました。");
+            error = "埋め込みの読み込みに失敗しました。";
+            showError = true;
             return;
         }
         const embeddingData = embeddings;
 
         if (!embeddingData.index.has(input)) {
-            alert(`語彙に存在しない熟語です: ${input}`);
+            error = `語彙に存在しない熟語です: ${input}`;
+            showError = true;
             return;
         }
 
         const similarities = kanjis.map((kanji) => {
             const s = similarity(embeddingData, input, kanji);
             if (s === null) {
-                alert(`語彙に存在しない文字が含まれています: ${kanji}`);
+                error = `語彙に存在しない文字が含まれています: ${kanji}`;
+                showError = true;
                 throw new Error(
                     `語彙に存在しない文字が含まれています: ${kanji}`,
                 );
@@ -163,6 +170,12 @@
             run();
         }
     }
+
+    function oninput() {
+        if (!input) {
+            showError = false;
+        }
+    }
 </script>
 
 <svelte:window onkeydown={handleDisplayModeKeydown} />
@@ -189,12 +202,16 @@
             {/each}
         </div>
     {:else}
-        <input
-            type="text"
-            placeholder="熟語を入力..."
-            onkeydown={handleKeydown}
-            bind:value={input}
-        />
+        <div class="input-wrapper">
+            <input
+                type="text"
+                placeholder="熟語を入力..."
+                onkeydown={handleKeydown}
+                bind:value={input}
+                {oninput}
+            />
+            <p class="error" style:opacity={showError ? 1 : 0}>{error}</p>
+        </div>
     {/if}
 </main>
 <div
@@ -257,23 +274,39 @@
         align-items: center;
         flex-direction: column;
 
-        input {
-            font-size: 2rem;
-            padding: 0.5em 1em;
-            border: none;
-            background-color: var(--color-transparent);
-            border-radius: 4px;
-            outline: none;
-            transition: border-color 0.3s ease;
+        .input-wrapper {
+            position: relative;
 
-            font-family: "Zen Old Mincho", serif;
+            input {
+                font-size: 2rem;
+                padding: 0.5em 1em;
+                border: none;
+                background-color: var(--color-transparent);
+                border-radius: 4px;
+                outline: none;
+                transition: border-color 0.3s ease;
 
-            text-align: center;
+                font-family: "Zen Old Mincho", serif;
 
-            color: var(--color-text-primary);
+                text-align: center;
 
-            &::placeholder {
-                color: var(--color-text-primary-muted);
+                color: var(--color-text-primary);
+
+                &::placeholder {
+                    color: var(--color-text-primary-muted);
+                }
+            }
+
+            .error {
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+
+                color: var(--color-error);
+                font-size: 0.875rem;
+
+                transition: opacity 0.3s ease;
             }
         }
 
