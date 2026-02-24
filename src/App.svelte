@@ -311,7 +311,14 @@
 
         .input-wrapper {
             position: relative;
-            width: min(32rem, 80vw);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+
+            height: 100%;
+            width: 100%;
 
             input {
                 font-size: 2rem;
@@ -339,7 +346,7 @@
                 flex-direction: column;
                 align-items: center;
                 gap: 0.5rem;
-                width: 100%;
+                width: 50vw;
 
                 .vector-loading-label {
                     color: var(--color-text-primary);
@@ -370,7 +377,7 @@
 
             .error {
                 position: absolute;
-                top: 100%;
+                top: calc(50% + (2rem + 1em) / 2 + 1rem);
                 left: 50%;
                 transform: translateX(-50%);
 
