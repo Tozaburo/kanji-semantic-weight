@@ -1,5 +1,7 @@
 # kanji-semantic-weight
 
+![スクリーンショット](./public/image.png)
+
 熟語を入力すると、各漢字がその熟語に対してどれくらい意味的に寄与しているかを可視化する Web アプリです。  
 Svelte + TypeScript + Vite で実装されています。
 
