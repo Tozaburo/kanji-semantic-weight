@@ -187,6 +187,16 @@
     <div class="gradient"></div>
     <span class="label">弱</span>
 </div>
+<span class="description">
+    <div class="enter">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"
+            ><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path
+                d="M160 128C142.3 128 128 113.7 128 96C128 78.3 142.3 64 160 64L256 64C309 64 352 107 352 160L352 466.7L425.4 393.3C437.9 380.8 458.2 380.8 470.7 393.3C483.2 405.8 483.2 426.1 470.7 438.6L342.7 566.6C330.2 579.1 309.9 579.1 297.4 566.6L169.4 438.6C156.9 426.1 156.9 405.8 169.4 393.3C181.9 380.8 202.2 380.8 214.7 393.3L288 466.7L288 160C288 142.3 273.7 128 256 128L160 128z"
+            /></svg
+        >
+    </div>
+    キーか背景をクリック
+</span>
 
 <style>
     main {
@@ -267,6 +277,40 @@
             color: oklch(0.11 0.0135 91.45);
 
             transform: translateY(-0.03em);
+        }
+    }
+
+    .description {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+
+        font-size: 0.875rem;
+        color: oklch(0.55 0.0213 262.14);
+
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+
+        .enter {
+            display: flex;
+            align-items: center;
+
+            border: 1px solid oklch(0.55 0.0213 262.14);
+            border-radius: 5px;
+
+            padding: 0.1em 0.2em;
+
+            svg {
+                width: 1em;
+                height: 1em;
+
+                transform: translateY(0.1em) rotate(90deg);
+
+                path {
+                    fill: oklch(0.55 0.0213 262.14);
+                }
+            }
         }
     }
 </style>
