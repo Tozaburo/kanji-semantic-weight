@@ -157,7 +157,7 @@
 
         isDisplayMode = true;
         void Promise.all([
-            displayedKanjisVw.set(50 / input.length),
+            displayedKanjisVw.set(40 / input.length),
             displayedKanjisColorProgress.set(1),
         ]);
     }
@@ -409,7 +409,7 @@
                 .percentage {
                     position: absolute;
 
-                    bottom: -2em;
+                    bottom: -1.5em;
 
                     font-size: 0.75rem;
                 }
