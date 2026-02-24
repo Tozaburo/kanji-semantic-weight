@@ -1,11 +1,43 @@
 @import url("https://fonts.googleapis.com/css2?family=Zen+Old+Mincho&display=swap");
 
 :root {
+    color-scheme: light dark;
+}
+
+:root {
+    --color-bg-base: oklch(0.99 0.0014 91.45);
+    --color-text-primary: oklch(0.11 0.0135 91.45);
+    --color-text-primary-muted: oklch(0.11 0.0135 91.45 / 0.5);
+    --color-gradient-strong: oklch(0.6142 0.1036 29.23);
+    --color-gradient-weak: oklch(0.6142 0.1036 264.052);
+    --color-ui-secondary: oklch(0.55 0.0213 262.14);
+    --color-modal-border: oklch(0.86 0.0105 262.14);
+    --color-overlay: rgba(0, 0, 0, 0.5);
+    --color-transparent: transparent;
+    --shadow-color-base: 0deg 0% 0%;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-bg-base: oklch(0.11 0.0082 262.14);
+        --color-text-primary: oklch(0.99 0.0008 262.14);
+        --color-text-primary-muted: oklch(0.86 0.0105 262.14);
+        --color-gradient-strong: oklch(0.7864 0.1036 29.23);
+        --color-gradient-weak: oklch(0.7864 0.1036 264.052);
+        --color-ui-secondary: oklch(0.55 0.0213 262.14);
+        --color-modal-border: oklch(0.41 0.0207 262.14);
+        --color-overlay: rgba(255, 255, 255, 0.5);
+        --color-transparent: transparent;
+        --shadow-color-base: 0deg 0% 0%;
+    }
+}
+
+:root {
     font-family: "Zen Old Mincho", serif;
     line-height: 1.5;
     font-weight: 400;
 
-    background-color: oklch(0.99 0.0014 91.45);
+    background-color: var(--color-bg-base);
 
     font-synthesis: none;
     -webkit-font-smoothing: antialiased;

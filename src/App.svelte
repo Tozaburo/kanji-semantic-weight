@@ -6,6 +6,12 @@
     import { loadEmbeddings, type Embeddings } from "./tools/loadWordVec";
     import { similarity } from "./tools/vectorSimilarity";
 
+    let currentTheme = $state(
+        window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light",
+    );
     let input = $state("");
     const kanjis = $derived(Array.from(input));
     let isDisplayMode = $state(false);
@@ -25,9 +31,20 @@
     const baseKanjiColor = { l: 0.11, c: 0.0135, h: 91.45 };
     const minKanjiHue = 29.23;
     const maxKanjiHue = 264.052;
-    const activeKanjiColor = { l: 0.6142, c: 0.1036 };
+    const activeKanjiColor = $derived({
+        l: currentTheme === "dark" ? 0.7864 : 0.6142,
+        c: 0.1036,
+    });
     let isClosingDisplayMode = $state(false);
     let isShowingHelp = $state(false);
+
+    if (window.matchMedia) {
+        window
+            .matchMedia("(prefers-color-scheme: dark)")
+            .addEventListener("change", function () {
+                currentTheme = this.matches ? "dark" : "light";
+            });
+    }
 
     function handleKeydown(event: KeyboardEvent) {
         if (event.key !== "Enter") return;
@@ -222,7 +239,8 @@
         >
             <img src="./image.png" alt="Screenshot of this website" />
             <p>
-                このサイトは、熟語を構成する各漢字の意味的な重みを視覚化するツールです。 <br>
+                このサイトは、熟語を構成する各漢字の意味的な重みを視覚化するツールです。
+                <br />
                 入力された熟語に対して、各漢字がどれだけ意味的に重要であるかを色で表現します。
             </p>
         </div>
@@ -243,7 +261,7 @@
             font-size: 2rem;
             padding: 0.5em 1em;
             border: none;
-            background-color: transparent;
+            background-color: var(--color-transparent);
             border-radius: 4px;
             outline: none;
             transition: border-color 0.3s ease;
@@ -252,10 +270,10 @@
 
             text-align: center;
 
-            color: oklch(0.11 0.0135 91.45);
+            color: var(--color-text-primary);
 
             &::placeholder {
-                color: oklch(0.11 0.0135 91.45 / 0.5);
+                color: var(--color-text-primary-muted);
             }
         }
 
@@ -297,15 +315,15 @@
 
             background: linear-gradient(
                 in oklch longer hue to right,
-                oklch(0.6142 0.1036 29.23),
-                oklch(0.6142 0.1036 264.052)
+                var(--color-gradient-strong),
+                var(--color-gradient-weak)
             );
             border-radius: 20px;
         }
 
         .label {
             font-size: 2rem;
-            color: oklch(0.11 0.0135 91.45);
+            color: var(--color-text-primary);
 
             transform: translateY(-0.03em);
         }
@@ -317,7 +335,7 @@
         right: 1.5rem;
 
         font-size: 0.875rem;
-        color: oklch(0.55 0.0213 262.14);
+        color: var(--color-ui-secondary);
 
         display: flex;
         align-items: center;
@@ -327,7 +345,7 @@
             display: flex;
             align-items: center;
 
-            border: 1px solid oklch(0.55 0.0213 262.14);
+            border: 1px solid var(--color-ui-secondary);
             border-radius: 5px;
 
             padding: 0.1em 0.2em;
@@ -339,7 +357,7 @@
                 transform: translateY(0.1em) rotate(90deg);
 
                 path {
-                    fill: oklch(0.55 0.0213 262.14);
+                    fill: var(--color-ui-secondary);
                 }
             }
         }
@@ -354,7 +372,7 @@
 
         padding: 0.5rem;
 
-        background-color: transparent;
+        background-color: var(--color-transparent);
         border: none;
 
         svg {
@@ -362,7 +380,7 @@
             aspect-ratio: 1;
 
             path {
-                fill: oklch(0.55 0.0213 262.14);
+                fill: var(--color-ui-secondary);
             }
         }
     }
@@ -381,7 +399,7 @@
             inset: 0;
 
             border: none;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: var(--color-overlay);
 
             cursor: pointer;
         }
@@ -399,9 +417,9 @@
             height: 100%;
             width: 100%;
 
-            border: solid 1px oklch(0.86 0.0105 262.14);
+            border: solid 1px var(--color-modal-border);
             border-radius: 1rem;
-            background-color: oklch(0.99 0.0014 91.45);
+            background-color: var(--color-bg-base);
 
             img {
                 width: 50%;
@@ -409,7 +427,7 @@
                 object-fit: cover;
                 border-radius: 0.5rem;
 
-                --shadow-color: 0deg 0% 0%;
+                --shadow-color: var(--shadow-color-base);
                 box-shadow:
                     0px 1px 1.1px hsl(var(--shadow-color) / 0.05),
                     0px 3.3px 3.7px -0.8px hsl(var(--shadow-color) / 0.05),
