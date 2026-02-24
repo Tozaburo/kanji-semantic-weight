@@ -392,6 +392,8 @@
             display: flex;
 
             .displayed-kanji {
+                position: relative;
+
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -401,7 +403,10 @@
                 }
 
                 .percentage {
-                    margin-top: 0.25em;
+                    position: absolute;
+
+                    bottom: -2em;
+
                     font-size: 0.75rem;
                 }
             }
