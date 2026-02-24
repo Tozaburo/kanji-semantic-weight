@@ -135,11 +135,23 @@
             isClosingDisplayMode = false;
         }
     }
+
+    function onclick(e: MouseEvent) {
+        if (e.target !== e.currentTarget) return;
+
+        if (isDisplayMode) {
+            void closeDisplayMode();
+        } else {
+            run();
+        }
+    }
 </script>
 
 <svelte:window onkeydown={handleDisplayModeKeydown} />
 
-<main>
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<main {onclick}>
     {#if isDisplayMode}
         <div class="displayed-kanjis">
             {#each kanjis as kanji, i}
@@ -167,7 +179,10 @@
         />
     {/if}
 </main>
-<div class="legend" style:opacity={isDisplayMode && !isClosingDisplayMode ? 1 : 0}>
+<div
+    class="legend"
+    style:opacity={isDisplayMode && !isClosingDisplayMode ? 1 : 0}
+>
     <span class="label">強</span>
     <div class="gradient"></div>
     <span class="label">弱</span>
@@ -238,7 +253,6 @@
         .gradient {
             width: 50vw;
             height: 20px;
-
 
             background: linear-gradient(
                 in oklch longer hue to right,
