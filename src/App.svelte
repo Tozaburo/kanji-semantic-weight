@@ -167,6 +167,11 @@
         />
     {/if}
 </main>
+<div class="legend" style:opacity={isDisplayMode && !isClosingDisplayMode ? 1 : 0}>
+    <span class="label">強</span>
+    <div class="gradient"></div>
+    <span class="label">弱</span>
+</div>
 
 <style>
     main {
@@ -215,6 +220,39 @@
                     font-size: 0.75rem;
                 }
             }
+        }
+    }
+
+    .legend {
+        position: fixed;
+        bottom: 7rem;
+        left: 50%;
+        transform: translateX(-50%);
+
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+
+        transition: opacity 0.3s ease;
+
+        .gradient {
+            width: 50vw;
+            height: 20px;
+
+
+            background: linear-gradient(
+                in oklch longer hue to right,
+                oklch(0.6142 0.1036 29.23),
+                oklch(0.6142 0.1036 264.052)
+            );
+            border-radius: 20px;
+        }
+
+        .label {
+            font-size: 2rem;
+            color: oklch(0.11 0.0135 91.45);
+
+            transform: translateY(-0.03em);
         }
     }
 </style>
