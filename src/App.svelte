@@ -27,6 +27,7 @@
     const maxKanjiHue = 264.052;
     const activeKanjiColor = { l: 0.6142, c: 0.1036 };
     let isClosingDisplayMode = $state(false);
+    let isShowingHelp = $state(false);
 
     function handleKeydown(event: KeyboardEvent) {
         if (event.key !== "Enter") return;
@@ -197,6 +198,36 @@
     </div>
     キーか背景をクリック
 </span>
+<button class="help" onclick={() => (isShowingHelp = !isShowingHelp)}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"
+        ><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path
+            d="M528 320C528 205.1 434.9 112 320 112C205.1 112 112 205.1 112 320C112 434.9 205.1 528 320 528C434.9 528 528 434.9 528 320zM64 320C64 178.6 178.6 64 320 64C461.4 64 576 178.6 576 320C576 461.4 461.4 576 320 576C178.6 576 64 461.4 64 320zM320 240C302.3 240 288 254.3 288 272C288 285.3 277.3 296 264 296C250.7 296 240 285.3 240 272C240 227.8 275.8 192 320 192C364.2 192 400 227.8 400 272C400 319.2 364 339.2 344 346.5L344 350.3C344 363.6 333.3 374.3 320 374.3C306.7 374.3 296 363.6 296 350.3L296 342.2C296 321.7 310.8 307 326.1 302C332.5 299.9 339.3 296.5 344.3 291.7C348.6 287.5 352 281.7 352 272.1C352 254.4 337.7 240.1 320 240.1zM288 432C288 414.3 302.3 400 320 400C337.7 400 352 414.3 352 432C352 449.7 337.7 464 320 464C302.3 464 288 449.7 288 432z"
+        /></svg
+    >
+</button>
+{#if isShowingHelp}
+    <div class="settings-modal-layer">
+        <button
+            class="settings-modal-backdrop"
+            type="button"
+            aria-label="Close settings modal"
+            onclick={() => (isShowingHelp = false)}
+        ></button>
+        <div
+            id="toolbar-settings-modal"
+            class="settings-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Settings"
+        >
+            <img src="./image.png" alt="Screenshot of this website" />
+            <p>
+                このサイトは、熟語を構成する各漢字の意味的な重みを視覚化するツールです。 <br>
+                入力された熟語に対して、各漢字がどれだけ意味的に重要であるかを色で表現します。
+            </p>
+        </div>
+    </div>
+{/if}
 
 <style>
     main {
@@ -310,6 +341,80 @@
                 path {
                     fill: oklch(0.55 0.0213 262.14);
                 }
+            }
+        }
+    }
+
+    .help {
+        cursor: pointer;
+
+        position: fixed;
+        top: 1.5rem;
+        right: 1.5rem;
+
+        padding: 0.5rem;
+
+        background-color: transparent;
+        border: none;
+
+        svg {
+            width: 2em;
+            aspect-ratio: 1;
+
+            path {
+                fill: oklch(0.55 0.0213 262.14);
+            }
+        }
+    }
+
+    .settings-modal-layer {
+        position: fixed;
+        inset: 0;
+        z-index: 1100;
+
+        display: grid;
+        place-items: center;
+        padding: 10rem;
+
+        .settings-modal-backdrop {
+            position: absolute;
+            inset: 0;
+
+            border: none;
+            background-color: rgba(0, 0, 0, 0.5);
+
+            cursor: pointer;
+        }
+
+        .settings-modal {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3rem;
+
+            position: relative;
+            z-index: 1;
+
+            height: 100%;
+            width: 100%;
+
+            border: solid 1px oklch(0.86 0.0105 262.14);
+            border-radius: 1rem;
+            background-color: oklch(0.99 0.0014 91.45);
+
+            img {
+                width: 50%;
+
+                object-fit: cover;
+                border-radius: 0.5rem;
+
+                --shadow-color: 0deg 0% 0%;
+                box-shadow:
+                    0px 1px 1.1px hsl(var(--shadow-color) / 0.05),
+                    0px 3.3px 3.7px -0.8px hsl(var(--shadow-color) / 0.05),
+                    0px 8.2px 9.2px -1.7px hsl(var(--shadow-color) / 0.05),
+                    0px 20px 22.5px -2.5px hsl(var(--shadow-color) / 0.05);
             }
         }
     }
