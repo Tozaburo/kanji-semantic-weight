@@ -5,6 +5,8 @@
 熟語を入力すると、各漢字がその熟語に対してどれくらい意味的に寄与しているかを可視化する Web アプリです。  
 Svelte + TypeScript + Vite で実装されています。
 
+[https://tozaburo.github.io/kanji-semantic-weight/](https://tozaburo.github.io/kanji-semantic-weight/)
+
 ## 主な機能
 
 - 漢字のみの熟語入力を受け付ける（2文字以上）
