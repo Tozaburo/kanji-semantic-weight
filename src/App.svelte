@@ -28,7 +28,11 @@
         duration: 380,
         easing: cubicOut,
     });
-    const baseKanjiColor = { l: 0.11, c: 0.0135, h: 91.45 };
+    const baseKanjiColor = $derived(
+        currentTheme === "dark"
+            ? { l: 0.99, c: 0.0008, h: 262.14 }
+            : { l: 0.11, c: 0.0135, h: 91.45 },
+    );
     const minKanjiHue = 29.23;
     const maxKanjiHue = 264.052;
     const activeKanjiColor = $derived({
