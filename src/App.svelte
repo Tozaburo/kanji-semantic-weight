@@ -318,7 +318,7 @@
             </p>
             <p>
                 <a
-                    href="https://github.com/Tozaburo/kanji-semantic-weight/NOTICE"
+                    href="https://github.com/Tozaburo/kanji-semantic-weight/blob/main/NOTICE"
                     >帰属表示</a
                 >
             </p>
