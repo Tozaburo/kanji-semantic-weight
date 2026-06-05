@@ -189,9 +189,8 @@
     }
 
     function oninput() {
-        if (!input) {
-            showError = false;
-        }
+        error = "";
+        showError = false;
     }
 </script>
 
@@ -318,7 +317,10 @@
                 2.0で提供されるchiVe由来の加工済みデータを使用しています。
             </p>
             <p>
-                <a href="https://github.com/Tozaburo/kanji-semantic-weight/NOTICE">帰属表示</a>
+                <a
+                    href="https://github.com/Tozaburo/kanji-semantic-weight/NOTICE"
+                    >帰属表示</a
+                >
             </p>
         </div>
     </div>
