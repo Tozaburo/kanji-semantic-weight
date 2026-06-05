@@ -35,3 +35,22 @@ npm run dev
 
 - 入力語や漢字が語彙に存在しない場合はエラー表示になります。
 - ベクトルファイルが欠けていると埋め込み読み込みに失敗します。
+
+## データの出典とライセンス
+
+このリポジトリには、chiVe 日本語単語分散表現を加工したデータが含まれています。
+
+元データ:
+chiVe Japanese word embeddings
+
+ライセンス:
+Apache License, Version 2.0
+
+著作権表示:
+- chiVe v1.0, v1.1, v1.2:
+  Copyright (c) 2020 National Institute for Japanese Language and Linguistics and Works Applications Co., Ltd. All rights reserved.
+- chiVe v1.3:
+  Copyright (c) 2024 Works Applications Co., Ltd. All rights reserved.
+
+加工内容:
+元の単語ベクトルデータを変換し、語彙情報を抽出し、ブラウザ上で単語の類似度計算に使いやすい形式にしました。

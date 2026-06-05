@@ -313,6 +313,13 @@
                 <br />
                 入力された熟語に対して、各漢字がどれだけ意味的に重要であるかを色で表現します。
             </p>
+            <p>
+                このサイトは、Apache License
+                2.0で提供されるchiVe由来の加工済みデータを使用しています。
+            </p>
+            <p>
+                <a href="https://github.com/Tozaburo/kanji-semantic-weight/NOTICE">帰属表示</a>
+            </p>
         </div>
     </div>
 {/if}

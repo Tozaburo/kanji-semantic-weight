@@ -1,0 +1,19 @@
+このプロジェクトには、chiVe Japanese word embeddings から派生した加工済みデータが含まれます。
+
+元データ:
+chiVe Japanese word embeddings
+
+ライセンス:
+Apache License, Version 2.0
+
+v1.0, v1.1, v1.2:
+Copyright (c) 2020 National Institute for Japanese Language and Linguistics and Works Applications Co., Ltd. All rights reserved.
+
+v1.3:
+Copyright (c) 2024 Works Applications Co., Ltd. All rights reserved.
+
+変更内容:
+元の単語ベクトルデータを、ブラウザ上で類似度計算に使いやすい形式へ変換しました。
+具体的には、語彙インデックスの抽出、ベクトル配列の変換、不要な情報の削除、読み込み用ファイルへの分割を行いました。
+
+このプロジェクトは、chiVeまたはWorks Applicationsによる公式プロジェクトではありません。
