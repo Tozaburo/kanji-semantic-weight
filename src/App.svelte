@@ -1,6 +1,6 @@
 <script lang="ts">
     import toPX from "to-px";
-    import { onMount } from "svelte";
+    import { onMount, tick } from "svelte";
     import { cubicOut } from "svelte/easing";
     import { Tween } from "svelte/motion";
     import { loadEmbeddings, type Embeddings } from "./tools/loadWordVec";
@@ -13,6 +13,7 @@
             : "light",
     );
     let input = $state("");
+    let inputElement: HTMLInputElement | null = $state(null);
     const kanjis = $derived(Array.from(input));
     let isDisplayMode = $state(false);
     let weights: number[] = $state([]);
@@ -174,6 +175,8 @@
             isDisplayMode = false;
         } finally {
             isClosingDisplayMode = false;
+            await tick();
+            inputElement?.focus();
         }
     }
 
@@ -246,6 +249,7 @@
                     onkeydown={handleKeydown}
                     bind:value={input}
                     {oninput}
+                    bind:this={inputElement}
                 />
                 <p class="error" style:opacity={showError ? 1 : 0}>{error}</p>
             {/if}
